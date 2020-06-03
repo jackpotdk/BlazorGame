@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Components;
+using Microsoft.AspNetCore.Components.Web;
 using Microsoft.JSInterop;
 using System;
 
@@ -12,12 +13,15 @@ namespace Blazor.Extensions
         [Parameter]
         public long Width { get; set; }
 
-        protected readonly string Id = Guid.NewGuid().ToString();
+        [Parameter]
+        public string Id { get; set; }
+
         protected ElementReference _canvasRef;
 
         internal ElementReference CanvasReference => this._canvasRef;
 
         [Inject]
         internal IJSRuntime JSRuntime { get; set; }
+
     }
 }

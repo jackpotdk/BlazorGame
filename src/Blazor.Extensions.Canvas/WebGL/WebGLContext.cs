@@ -289,12 +289,12 @@ namespace Blazor.Extensions.Canvas.WebGL
         public async Task BufferDataAsync(BufferType target, int size, BufferUsageHint usage) => await this.BatchCallAsync(BUFFER_DATA, isMethodCall: true, target, size, usage);
 
         [Obsolete("Use the async version instead, which is already called internally.")]
-        public void BufferData<T>(BufferType target, T[] data, BufferUsageHint usage) => this.CallMethod<object>(BUFFER_DATA, target, this.ConvertToByteArray(data), usage);
-        public async Task BufferDataAsync<T>(BufferType target, T[] data, BufferUsageHint usage) => await this.BatchCallAsync(BUFFER_DATA, isMethodCall: true, target, this.ConvertToByteArray(data), usage);
+        public void BufferData<T>(BufferType target, T[] data, BufferUsageHint usage) => this.CallMethod<object>(BUFFER_DATA, target, data, usage);
+        public async Task BufferDataAsync<T>(BufferType target, T[] data, BufferUsageHint usage) => await this.BatchCallAsync(BUFFER_DATA, isMethodCall: true, target, data, usage);
 
         [Obsolete("Use the async version instead, which is already called internally.")]
-        public void BufferSubData<T>(BufferType target, uint offset, T[] data) => this.CallMethod<object>(BUFFER_SUB_DATA, target, offset, this.ConvertToByteArray(data));
-        public async Task BufferSubDataAsync<T>(BufferType target, uint offset, T[] data) => await this.BatchCallAsync(BUFFER_SUB_DATA, isMethodCall: true, target, offset, this.ConvertToByteArray(data));
+        public void BufferSubData<T>(BufferType target, uint offset, T[] data) => this.CallMethod<object>(BUFFER_SUB_DATA, target, offset, data);
+        public async Task BufferSubDataAsync<T>(BufferType target, uint offset, T[] data) => await this.BatchCallAsync(BUFFER_SUB_DATA, isMethodCall: true, target, offset, data);
 
         [Obsolete("Use the async version instead, which is already called internally.")]
         public WebGLBuffer CreateBuffer() => this.CallMethod<WebGLBuffer>(CREATE_BUFFER);
@@ -410,7 +410,7 @@ namespace Blazor.Extensions.Canvas.WebGL
             => this.CallMethod<object>(TEX_IMAGE_2D, target, level, internalFormat, width, height, format, type, pixels);
         public async Task TexImage2DAsync<T>(Texture2DType target, int level, PixelFormat internalFormat, int width, int height, PixelFormat format, PixelType type, T[] pixels)
             where T : struct
-            => await this.BatchCallAsync(TEX_IMAGE_2D, isMethodCall: true, target, level, internalFormat, width, height, format, type, pixels);
+            => await this.BatchCallAsync(TEX_IMAGE_2D, isMethodCall: true, target, level, internalFormat, width, height, 0, format, type, pixels);
 
         [Obsolete("Use the async version instead, which is already called internally.")]
         public void TexSubImage2D<T>(Texture2DType target, int level, int xoffset, int yoffset, int width, int height, PixelFormat format, PixelType type, T[] pixels)
@@ -730,12 +730,6 @@ namespace Blazor.Extensions.Canvas.WebGL
         public void Flush() => this.CallMethod<object>(FLUSH);
         public async Task FlushAsync() => await this.BatchCallAsync(FLUSH, isMethodCall: true);
 
-        private byte[] ConvertToByteArray<T>(T[] arr)
-        {
-            byte[] byteArr = new byte[arr.Length * Marshal.SizeOf<T>()];
-            Buffer.BlockCopy(arr, 0, byteArr, 0, byteArr.Length);
-            return byteArr;
-        }
         private async Task<int> GetDrawingBufferWidthAsync() => await this.GetPropertyAsync<int>(DRAWING_BUFFER_WIDTH);
         private async Task<int> GetDrawingBufferHeightAsync() => await this.GetPropertyAsync<int>(DRAWING_BUFFER_HEIGHT);
         #endregion

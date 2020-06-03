@@ -1,0 +1,90 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width|, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>BlazorGame</title>
+  <base href="/" />
+  <script src="_content/Blazor.Extensions.Canvas/blazor.extensions.canvas.js"></script>
+  <style>
+      html, body {
+          margin: 0;
+          background-color: white;
+      }
+
+      canvas {
+          display: block; /* prevents scrollbar */
+          width: 100vw;
+          height: 100vh;
+      }
+  </style>
+</head>
+<body>
+    <app>Loading...</app>
+
+    <script src="_framework/blazor.webassembly.js"></script>
+    <script>navigator.serviceWorker.register('service-worker.js', { updateViaCache: 'none' })</script>
+
+    <script type="text/javascript">
+
+        window.anim = {
+            start: function (instance) {
+                return window.requestAnimationFrame(function (timestamp) { anim.callback(instance); });
+            },
+
+            callback: function (instance) {
+
+                canvas = document.getElementById("gamesterCanvas");
+
+                var displayWidth = canvas.clientWidth;
+                var displayHeight = canvas.clientHeight;
+
+                // Check if the canvas is not the same size.
+                if (canvas.width != displayWidth ||
+                    canvas.height != displayHeight) {
+
+                    // Make the canvas the same size
+                    canvas.width = displayWidth;
+                    canvas.height = displayHeight;
+                }
+
+                instance.invokeMethod('eventRequestAnimationFrame', displayWidth, displayHeight);
+
+                var callbackId = window.requestAnimationFrame(function (timestamp) { anim.callback(instance); });
+            },
+
+            stop: function (callbackId) {
+                window.cancelAnimationFrame(callbackId);
+            },
+
+            loadTexture: function (filename) {
+                canvas = document.getElementById("gamesterCanvas");
+                var gl = canvas.getContext("webgl");
+
+                var image = new Image();
+                image.src = filename;
+                image.addEventListener('load', function () {
+                    // Now that the image has loaded make copy it to the texture.
+                    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
+                    gl.generateMipmap(gl.TEXTURE_2D);
+                });
+            }
+        };
+
+
+        function hookMouseEvents(dotNetObject) {
+
+            canvas = document.getElementById("gamesterCanvas");
+
+            canvas.addEventListener('mousedown', function (evt) {
+                dotNetObject.invokeMethod('eventMouseDown', evt.clientX, evt.clientY);
+            }, false);
+
+            canvas.addEventListener('mouseup', function (evt) {
+                dotNetObject.invokeMethod('eventMouseUp', evt.clientX, evt.clientY);
+            }, false);
+        };
+
+    </script>
+</body>
+</html>
